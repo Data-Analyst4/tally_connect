@@ -1,0 +1,253 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-12 15:36:20.057537",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "identification_section",
+  "sync_id",
+  "created_on",
+  "document_info_section",
+  "document_type",
+  "document_name",
+  "company",
+  "sync_type",
+  "status_section",
+  "sync_status",
+  "sync_started_at",
+  "response_received_at",
+  "section_break_qpno",
+  "error_message",
+  "error_type",
+  "requires_manual_review",
+  "retry_section",
+  "retry_count",
+  "max_retries",
+  "next_retry_at",
+  "retry_history",
+  "payload_snapshot_section",
+  "erpnext_data_snapshot",
+  "request_xml",
+  "response_xml",
+  "reconciliation_section",
+  "reconciliation_status",
+  "reconciliation_checks",
+  "admin_notes_section",
+  "manual_correction_notes",
+  "tally_acknowledgment"
+ ],
+ "fields": [
+  {
+   "fieldname": "identification_section",
+   "fieldtype": "Section Break",
+   "label": "Identification"
+  },
+  {
+   "fieldname": "sync_id",
+   "fieldtype": "Data",
+   "label": "Sync ID",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "created_on",
+   "fieldtype": "Datetime",
+   "label": "Created On"
+  },
+  {
+   "fieldname": "document_info_section",
+   "fieldtype": "Section Break",
+   "label": "Document Info"
+  },
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Document Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "document_name",
+   "fieldtype": "Data",
+   "label": "Document Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sync_type",
+   "fieldtype": "Select",
+   "label": "Sync Type",
+   "options": "MASTER CREATE\nTRANSACTION",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status_section",
+   "fieldtype": "Section Break",
+   "label": "Status"
+  },
+  {
+   "default": "QUEUED",
+   "fieldname": "sync_status",
+   "fieldtype": "Select",
+   "label": "Sync Status",
+   "options": "QUEUED\nIN PROGRESS\nSUCCESS\nFAILED",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sync_started_at",
+   "fieldtype": "Datetime",
+   "label": "Sync Started At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "response_received_at",
+   "fieldtype": "Datetime",
+   "label": "Response Received At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_qpno",
+   "fieldtype": "Section Break",
+   "label": "Error & Review"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Long Text",
+   "label": "Error Message"
+  },
+  {
+   "fieldname": "error_type",
+   "fieldtype": "Select",
+   "label": "Error Type",
+   "options": "NETWORK ERROR\nVALIDATION ERROR\nAPPLICATION ERROR\nUNKNOWN ERROR"
+  },
+  {
+   "default": "0",
+   "fieldname": "requires_manual_review",
+   "fieldtype": "Check",
+   "label": "Requires Manual Review"
+  },
+  {
+   "fieldname": "retry_section",
+   "fieldtype": "Section Break",
+   "label": "Retry"
+  },
+  {
+   "default": "0",
+   "fieldname": "retry_count",
+   "fieldtype": "Int",
+   "label": "Retry Count"
+  },
+  {
+   "default": "3",
+   "fieldname": "max_retries",
+   "fieldtype": "Int",
+   "label": "Max Retries"
+  },
+  {
+   "fieldname": "next_retry_at",
+   "fieldtype": "Datetime",
+   "label": "Next Retry At"
+  },
+  {
+   "default": "[]",
+   "fieldname": "retry_history",
+   "fieldtype": "Code",
+   "label": "Retry History",
+   "options": "JSON"
+  },
+  {
+   "fieldname": "payload_snapshot_section",
+   "fieldtype": "Section Break",
+   "label": "Payload Snapshot"
+  },
+  {
+   "fieldname": "erpnext_data_snapshot",
+   "fieldtype": "Code",
+   "label": "ERPNext Data Snapshot",
+   "options": "JSON"
+  },
+  {
+   "fieldname": "request_xml",
+   "fieldtype": "Code",
+   "label": "Request XML",
+   "options": "XML"
+  },
+  {
+   "fieldname": "response_xml",
+   "fieldtype": "Code",
+   "label": "Response XML",
+   "options": "XML"
+  },
+  {
+   "fieldname": "reconciliation_section",
+   "fieldtype": "Section Break",
+   "label": "Reconciliation"
+  },
+  {
+   "default": "PENDING",
+   "fieldname": "reconciliation_status",
+   "fieldtype": "Select",
+   "label": "Reconciliation Status",
+   "options": "\nPENDING\nVERIFIED\nMISMATCH"
+  },
+  {
+   "default": "{}",
+   "fieldname": "reconciliation_checks",
+   "fieldtype": "Code",
+   "label": "Reconciliation Checks",
+   "options": "JSON"
+  },
+  {
+   "fieldname": "admin_notes_section",
+   "fieldtype": "Section Break",
+   "label": "Admin Notes"
+  },
+  {
+   "fieldname": "manual_correction_notes",
+   "fieldtype": "Long Text",
+   "label": "Manual Correction Notes"
+  },
+  {
+   "default": "{}",
+   "fieldname": "tally_acknowledgment",
+   "fieldtype": "Code",
+   "label": "Tally Acknowledgment",
+   "options": "JSON"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-12 16:18:59.838389",
+ "modified_by": "Administrator",
+ "module": "Tally Integration",
+ "name": "Tally Sync Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

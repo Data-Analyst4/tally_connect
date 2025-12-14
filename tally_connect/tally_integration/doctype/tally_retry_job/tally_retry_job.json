@@ -1,0 +1,76 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-12 16:24:14.312829",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sync_log",
+  "attempt_number",
+  "scheduled_at",
+  "status",
+  "processed_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "sync_log",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Sync Log",
+   "options": "Tally Sync Log",
+   "reqd": 1
+  },
+  {
+   "fieldname": "attempt_number",
+   "fieldtype": "Int",
+   "label": "Attempt Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "scheduled_at",
+   "fieldtype": "Datetime",
+   "label": "Scheduled At",
+   "reqd": 1
+  },
+  {
+   "default": "PENDING",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nPENDING\nPROCESSED\nCANCELLED"
+  },
+  {
+   "fieldname": "processed_on",
+   "fieldtype": "Datetime",
+   "label": "Processed On",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-12 16:27:42.618455",
+ "modified_by": "Administrator",
+ "module": "Tally Integration",
+ "name": "Tally Retry Job",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,392 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-12 15:02:22.197344",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "connection_section",
+  "enabled",
+  "tally_url",
+  "erpnext_company",
+  "tally_company_name",
+  "defaults_section",
+  "default_customer_ledger",
+  "default_supplier_ledger",
+  "default_inventory_stock_group",
+  "voucher_and_posting_behaviour_section",
+  "sales_voucher_type",
+  "voucher_object_view",
+  "sales_ledger_name",
+  "gst__tax_ledger_configuration_mandatory_section",
+  "cgst_ledger_name",
+  "sgst_ledger_name",
+  "igst_ledger_name",
+  "round_off_ledger_name",
+  "tax_ledger_posting_mode",
+  "quantity__case_control_business_rule_section",
+  "case_size_units_per_case",
+  "quantity_enforcement_mode",
+  "inventory_location_and_batch_defaults_section",
+  "default_godown_name",
+  "default_batch_name",
+  "send_batch_allocations",
+  "gst_classification_behaviour_section",
+  "gst_classification_source",
+  "gst_classification_naming_mode",
+  "credit_note_configuration_section",
+  "credit_note_voucher_type",
+  "credit_note_quantity_sign_mode",
+  "credit_note_reference_source",
+  "credit_note_sales_ledger_name",
+  "allow_credit_note_posting",
+  "retry_settings_section",
+  "enable_auto_retry",
+  "max_retry_attempts",
+  "retry_intervals_minutes",
+  "field_mappings_section",
+  "table_tgrr",
+  "notifications_section",
+  "notify_on_failure",
+  "notification_roles",
+  "data_retention_section",
+  "data_retention_days",
+  "enable_daily_cleanup"
+ ],
+ "fields": [
+  {
+   "fieldname": "tally_url",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Tally URL",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "erpnext_company",
+   "fieldtype": "Link",
+   "label": "ERPNext Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "tally_company_name",
+   "fieldtype": "Data",
+   "label": "Tally Company Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "connection_section",
+   "fieldtype": "Section Break",
+   "label": "Connection"
+  },
+  {
+   "fieldname": "defaults_section",
+   "fieldtype": "Section Break",
+   "label": "Defaults"
+  },
+  {
+   "default": "Sundry Debtors",
+   "fieldname": "default_customer_ledger",
+   "fieldtype": "Data",
+   "label": "Default Customer Ledger",
+   "reqd": 1
+  },
+  {
+   "default": "Sundry Creditors",
+   "fieldname": "default_supplier_ledger",
+   "fieldtype": "Data",
+   "label": "Default Supplier Ledger",
+   "reqd": 1
+  },
+  {
+   "default": "Finished Goods",
+   "fieldname": "default_inventory_stock_group",
+   "fieldtype": "Data",
+   "label": "Default Inventory Stock Group"
+  },
+  {
+   "fieldname": "retry_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Retry Settings"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_auto_retry",
+   "fieldtype": "Check",
+   "label": "Enable Auto Retry"
+  },
+  {
+   "default": "3",
+   "fieldname": "max_retry_attempts",
+   "fieldtype": "Int",
+   "label": "Max Retry Attempts",
+   "reqd": 1
+  },
+  {
+   "default": "[5, 30, 60]",
+   "fieldname": "retry_intervals_minutes",
+   "fieldtype": "Code",
+   "label": "Retry Intervals (minutes)",
+   "options": "JSON",
+   "reqd": 1
+  },
+  {
+   "fieldname": "notifications_section",
+   "fieldtype": "Section Break",
+   "label": "Notifications"
+  },
+  {
+   "default": "1",
+   "fieldname": "notify_on_failure",
+   "fieldtype": "Check",
+   "label": "Notify on Failure"
+  },
+  {
+   "fieldname": "data_retention_section",
+   "fieldtype": "Section Break",
+   "label": "Data Retention"
+  },
+  {
+   "fieldname": "data_retention_days",
+   "fieldtype": "Int",
+   "label": "Data Retention Days",
+   "options": "365",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_daily_cleanup",
+   "fieldtype": "Check",
+   "label": "Enable Daily Cleanup"
+  },
+  {
+   "fieldname": "notification_roles",
+   "fieldtype": "Table",
+   "label": "Notification Roles",
+   "options": "Tally Notification Role"
+  },
+  {
+   "fieldname": "voucher_and_posting_behaviour_section",
+   "fieldtype": "Section Break",
+   "label": "Voucher and Posting Behaviour"
+  },
+  {
+   "default": "Sales",
+   "description": "Tally Voucher Type used when posting Sales Invoices.",
+   "fieldname": "sales_voucher_type",
+   "fieldtype": "Data",
+   "label": "Sales Voucher Type",
+   "reqd": 1
+  },
+  {
+   "default": "Invoice Voucher View",
+   "description": "Tally internal object view for invoice-style vouchers.",
+   "fieldname": "voucher_object_view",
+   "fieldtype": "Data",
+   "label": "Voucher Object View"
+  },
+  {
+   "default": "SALES A/C",
+   "description": "Revenue ledger used inside inventory accounting allocation.",
+   "fieldname": "sales_ledger_name",
+   "fieldtype": "Data",
+   "label": "Sales Ledger Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "gst__tax_ledger_configuration_mandatory_section",
+   "fieldtype": "Section Break",
+   "label": "GST / TAX Ledger Configuration (Mandatory)"
+  },
+  {
+   "default": "CGST",
+   "description": "Ledger name for CGST posting in Tally.",
+   "fieldname": "cgst_ledger_name",
+   "fieldtype": "Data",
+   "label": "CGST Ledger Name",
+   "reqd": 1
+  },
+  {
+   "default": "SGST",
+   "description": "Ledger name for SGST posting in Tally.",
+   "fieldname": "sgst_ledger_name",
+   "fieldtype": "Data",
+   "label": "SGST Ledger Name",
+   "reqd": 1
+  },
+  {
+   "default": "IGST",
+   "description": "Ledger name for IGST posting in Tally (inter-state).",
+   "fieldname": "igst_ledger_name",
+   "fieldtype": "Data",
+   "label": "IGST Ledger Name",
+   "reqd": 1
+  },
+  {
+   "default": "Round Off",
+   "description": "Ledger used for rounding adjustment in vouchers.",
+   "fieldname": "round_off_ledger_name",
+   "fieldtype": "Data",
+   "label": "Round Off Ledger Name"
+  },
+  {
+   "default": "POST ONLY IF AMOUNT  ONZERO",
+   "description": "Controls whether tax ledgers are posted only when amount > 0.",
+   "fieldname": "tax_ledger_posting_mode",
+   "fieldtype": "Select",
+   "label": "Tax Ledger Posting Mode",
+   "options": "\nPOST ONLY IF AMOUNT  ONZERO\nALWAYS POST",
+   "reqd": 1
+  },
+  {
+   "description": "This is accounting control, not UI convenience.",
+   "fieldname": "quantity__case_control_business_rule_section",
+   "fieldtype": "Section Break",
+   "label": "Quantity / Case Control (Business Rule)"
+  },
+  {
+   "default": "6",
+   "description": "Number of base units per case (e.g. 6 bottles per box).",
+   "fieldname": "case_size_units_per_case",
+   "fieldtype": "Int",
+   "label": "Case Size (Units per Case)",
+   "reqd": 1
+  },
+  {
+   "default": "BLOCK IF NOT MULTIPLE",
+   "description": "Controls what happens if item qty is not a multiple of case size.",
+   "fieldname": "quantity_enforcement_mode",
+   "fieldtype": "Select",
+   "label": "Quantity Enforcement Mode",
+   "options": "\nBLOCK IF NOT MULTIPLE\nFLOOR TO CASE\nROUND TO NEAREST CASE"
+  },
+  {
+   "fieldname": "inventory_location_and_batch_defaults_section",
+   "fieldtype": "Section Break",
+   "label": "Inventory Location and Batch Defaults"
+  },
+  {
+   "default": "Main Location",
+   "description": "Godown used in inventory & batch allocations.",
+   "fieldname": "default_godown_name",
+   "fieldtype": "Data",
+   "label": "Default Godown Name",
+   "reqd": 1
+  },
+  {
+   "default": "Primary Batch",
+   "description": "Batch name used when batch allocations are sent.",
+   "fieldname": "default_batch_name",
+   "fieldtype": "Data",
+   "label": "Default Batch Name"
+  },
+  {
+   "default": "1",
+   "description": "Controls whether &lt;BATCHALLOCATIONS.LIST&gt; is included in XML.",
+   "fieldname": "send_batch_allocations",
+   "fieldtype": "Check",
+   "label": "Send Batch Allocations"
+  },
+  {
+   "fieldname": "gst_classification_behaviour_section",
+   "fieldtype": "Section Break",
+   "label": "GST Classification Behaviour"
+  },
+  {
+   "description": "Where Tally should infer GST classification from.",
+   "fieldname": "gst_classification_source",
+   "fieldtype": "Select",
+   "label": "GST Classification Source",
+   "options": "\nSTOCK GROUP\nSTOCK ITEM",
+   "reqd": 1
+  },
+  {
+   "description": "Controls how GST classification names are derived\n(Kombucha / Iced Tea / Soda).",
+   "fieldname": "gst_classification_naming_mode",
+   "fieldtype": "Select",
+   "label": "GST Classification Naming Mode",
+   "options": "\nITEM GROUP NAME\nFIXED VALUE",
+   "reqd": 1
+  },
+  {
+   "fieldname": "credit_note_configuration_section",
+   "fieldtype": "Section Break",
+   "label": "Credit Note Configuration"
+  },
+  {
+   "default": "Credit Note",
+   "fieldname": "credit_note_voucher_type",
+   "fieldtype": "Data",
+   "label": "Credit Note Voucher Type",
+   "reqd": 1
+  },
+  {
+   "default": "NEGATIVE",
+   "fieldname": "credit_note_quantity_sign_mode",
+   "fieldtype": "Select",
+   "label": "Credit Note Quantity Sign Mode",
+   "options": "\nNEGATIVE\nPOSITIVE",
+   "reqd": 1
+  },
+  {
+   "default": "ORIGINAL INVOICE",
+   "fieldname": "credit_note_reference_source",
+   "fieldtype": "Select",
+   "label": "Credit Note Reference Source",
+   "options": "\nORIGINAL INVOICE\nMANUAL\nNONE",
+   "reqd": 1
+  },
+  {
+   "fieldname": "credit_note_sales_ledger_name",
+   "fieldtype": "Data",
+   "label": "Credit Note Sales Ledger Override"
+  },
+  {
+   "default": "1",
+   "fieldname": "allow_credit_note_posting",
+   "fieldtype": "Check",
+   "label": "Credit Note Allow Posting"
+  },
+  {
+   "fieldname": "field_mappings_section",
+   "fieldtype": "Section Break",
+   "label": "Field Mappings"
+  },
+  {
+   "fieldname": "table_tgrr",
+   "fieldtype": "Table",
+   "options": "Tally Field Mapping"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-12-13 11:08:26.312206",
+ "modified_by": "Administrator",
+ "module": "Tally Integration",
+ "name": "Tally Integration Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
