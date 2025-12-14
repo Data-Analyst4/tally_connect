@@ -1,0 +1,239 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "creation": "2025-12-14 20:06:52.103704",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "basic_identification_section",
+  "column_break_jrks",
+  "mapping_name",
+  "document_type",
+  "mapping_category",
+  "field_mapping_configuration_section",
+  "erpnext_field",
+  "tally_xml_tag",
+  "tally_master_type",
+  "transformation_rules_section",
+  "transformation_type",
+  "transformation_json",
+  "default_value",
+  "validation_and_control_section",
+  "is_required",
+  "is_active",
+  "sequence_order",
+  "multi_company_and_filter_section",
+  "company",
+  "apply_for_voucher_type",
+  "documentation_and_tracking_section",
+  "description",
+  "example_erpnext_value",
+  "example_tally_value",
+  "notes",
+  "last_modified_by"
+ ],
+ "fields": [
+  {
+   "bold": 1,
+   "fieldname": "mapping_name",
+   "fieldtype": "Data",
+   "label": "Mapping Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "label": "Document Type",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "basic_identification_section",
+   "fieldtype": "Section Break",
+   "label": "Basic Identification"
+  },
+  {
+   "fieldname": "column_break_jrks",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Categorize mappings for better organization",
+   "fieldname": "mapping_category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Master\nTransaction\nInventory\nLedger\nTax\nCustom",
+   "reqd": 1
+  },
+  {
+   "fieldname": "field_mapping_configuration_section",
+   "fieldtype": "Section Break",
+   "label": "Field Mapping Configuration"
+  },
+  {
+   "description": "The source field in ERPNext document",
+   "fieldname": "erpnext_field",
+   "fieldtype": "Data",
+   "label": "ERPNext Field Name"
+  },
+  {
+   "description": "The XML tag name in Tally",
+   "fieldname": "tally_xml_tag",
+   "fieldtype": "Data",
+   "label": "Tally XML Tag",
+   "reqd": 1
+  },
+  {
+   "description": "Specify which Tally master this creates/references",
+   "fieldname": "tally_master_type",
+   "fieldtype": "Select",
+   "label": "Tally Master Type",
+   "options": "Ledger\nStock Item\nStock Group\nUnit\nGodown\nVoucher Type\nCost Center\nNot Applicable"
+  },
+  {
+   "fieldname": "transformation_rules_section",
+   "fieldtype": "Section Break",
+   "label": "Transformation Rules "
+  },
+  {
+   "default": "DIRECT",
+   "description": "How to transform ERPNext value to Tally value",
+   "fieldname": "transformation_type",
+   "fieldtype": "Select",
+   "label": "Transformation Type",
+   "options": "DIRECT\nDATE_FORMAT\nLOOKUP\nCONDITIONAL\nCALCULATION\nSETTING_LOOKUP\nCUSTOM_FUNCTION",
+   "reqd": 1
+  },
+  {
+   "description": "Configuration for transformation logic",
+   "fieldname": "transformation_json",
+   "fieldtype": "Code",
+   "label": "Transformation Config (JSON)",
+   "options": "JSON"
+  },
+  {
+   "description": "Value to use when ERPNext field is empty or null",
+   "fieldname": "default_value",
+   "fieldtype": "Small Text",
+   "label": "Default Value"
+  },
+  {
+   "fieldname": "validation_and_control_section",
+   "fieldtype": "Section Break",
+   "label": "Validation and Control"
+  },
+  {
+   "default": "0",
+   "description": "Mark if this field is mandatory for Tally posting",
+   "fieldname": "is_required",
+   "fieldtype": "Check",
+   "label": "Is Required"
+  },
+  {
+   "default": "0",
+   "description": "Enable/disable mapping without deleting",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "label": "Active"
+  },
+  {
+   "default": "10",
+   "description": "Control the order of XML tags",
+   "fieldname": "sequence_order",
+   "fieldtype": "Int",
+   "label": "Sequence Order"
+  },
+  {
+   "fieldname": "multi_company_and_filter_section",
+   "fieldtype": "Section Break",
+   "label": "Multi Company and Filter"
+  },
+  {
+   "description": "Company-specific mappings",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "default": "All",
+   "description": "Apply mapping only for specific voucher types",
+   "fieldname": "apply_for_voucher_type",
+   "fieldtype": "Select",
+   "label": "Apply For Voucher Type",
+   "options": "All\nSales\nPurchase\nReceipt\nPayment\nJournal\nCredit Note\nDebit Note"
+  },
+  {
+   "fieldname": "documentation_and_tracking_section",
+   "fieldtype": "Section Break",
+   "label": "Documentation and Tracking"
+  },
+  {
+   "description": "Document what this mapping does",
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Description"
+  },
+  {
+   "description": "Show example input value",
+   "fieldname": "example_erpnext_value",
+   "fieldtype": "Data",
+   "label": "Example ERPNext Value"
+  },
+  {
+   "description": "Show example output value",
+   "fieldname": "example_tally_value",
+   "fieldtype": "Data",
+   "label": "Example Tally Value"
+  },
+  {
+   "description": "Notes for developers/admins",
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "Internal Notes"
+  },
+  {
+   "description": "Track who changed the mapping",
+   "fieldname": "last_modified_by",
+   "fieldtype": "Link",
+   "label": "Last Modified By",
+   "options": "User",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-14 23:52:54.644458",
+ "modified_by": "Administrator",
+ "module": "Tally Integration",
+ "name": "ERPNext Tally Mapping",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
