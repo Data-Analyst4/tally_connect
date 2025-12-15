@@ -249,3 +249,57 @@ def check_tally_company():
     """
     from tally_connect.tally_integration.utils import verify_tally_company
     return verify_tally_company()
+
+# ADD TO END OF checkers.py
+
+@frappe.whitelist()
+def check_dependencies_and_create_requests(doctype, docname, company):
+    """
+    Check dependencies and create requests for missing masters
+    
+    Called from: Document submit hooks
+    
+    Returns:
+        dict: {
+            "has_missing": bool,
+            "missing_count": int,
+            "requests_created": [request_names]
+        }
+    """
+    from tally_connect.tally_integration.api.dependency_checker import check_dependencies_for_document
+    
+    missing = check_dependencies_for_document(doctype, docname, company)
+    
+    if not missing:
+        return {
+            "has_missing": False,
+            "missing_count": 0
+        }
+    
+    # Create requests for missing masters
+    requests_created = []
+    
+    for master in missing:
+        request = frappe.get_doc({
+            "doctype": "Tally Master Creation Request",
+            "master_type": master["type"],
+            "erpnext_doctype": master["erpnext_doctype"],
+            "erpnext_document": master["name"],
+            "master_name": master["display_name"],
+            "parent_group": master.get("parent"),
+            "company": company,
+            "linked_transaction": docname,
+            "linked_transaction_doctype": doctype,
+            "priority": "Normal"
+        })
+        request.insert(ignore_permissions=True)
+        requests_created.append(request.name)
+    
+    frappe.db.commit()
+    
+    return {
+        "has_missing": True,
+        "missing_count": len(missing),
+        "requests_created": requests_created,
+        "missing_masters": missing
+    }

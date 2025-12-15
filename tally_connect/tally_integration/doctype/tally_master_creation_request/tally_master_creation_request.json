@@ -133,7 +133,7 @@
   },
   {
    "fieldname": "erpnext_document",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "ERPNext Document",
    "options": "DocType",
    "reqd": 1
@@ -323,7 +323,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-15 02:51:29.062462",
+ "modified": "2025-12-15 12:21:36.898022",
  "modified_by": "Administrator",
  "module": "Tally Integration",
  "name": "Tally Master Creation Request",

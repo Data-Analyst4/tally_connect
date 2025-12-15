@@ -247,3 +247,27 @@ app_license = "mit"
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
+# FILE: tally_connect/hooks.py
+# ADD/UPDATE these sections
+
+# Document Events
+doc_events = {
+    "Sales Order": {
+        "before_submit": "tally_connect.tally_integration.hooks.invoice_hooks.check_dependencies_before_submit"
+    },
+    "Sales Invoice": {
+        "before_submit": "tally_connect.tally_integration.hooks.invoice_hooks.check_dependencies_before_submit"
+    }
+    # "Purchase Order": {
+    #     "before_submit": "tally_connect.tally_integration.hooks.invoice_hooks.check_dependencies_before_submit"
+    # },
+    # "Purchase Invoice": {
+    #     "before_submit": "tally_connect.tally_integration.hooks.invoice_hooks.check_dependencies_before_submit"
+    # }
+}
+
+# Client Scripts (add this section if not exists)
+doctype_js = {
+    "Sales Order": "tally_integration/client_scripts/sales_order.js",
+    "Sales Invoice": "tally_integration/client_scripts/sales_order.js"
+}
