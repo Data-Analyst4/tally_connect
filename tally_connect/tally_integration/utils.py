@@ -1231,3 +1231,63 @@ Add this to your utils.py
 #             "error": str(e)
 #         }
 
+
+# in utils.py (or a new gst_utils.py)
+
+import requests
+import frappe
+
+def get_address_from_gstin(gstin: str) -> dict:
+    """
+    Fetch registered address for a GSTIN using your GST verification API.
+
+    Returns a dict:
+    {
+        "address_line1": str or None,
+        "address_line2": str or None,
+        "city": str or None,
+        "state": str or None,
+        "pincode": str or None,
+    }
+    """
+    if not gstin:
+        return {}
+
+    # TODO: move these to Tally Integration Settings or Site Config
+    api_url = "https://your-gst-provider.com/api/gst-details"  # replace
+    api_key = frappe.db.get_single_value("Tally Integration Settings", "gst_api_key")
+
+    try:
+        resp = requests.get(
+            api_url,
+            params={"gstin": gstin},
+            headers={"Authorization": f"Bearer {api_key}"},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+
+        # Example mapping – adjust keys to your provider’s JSON
+        # Many APIs return something like result.primary_business_address.registered_address
+        result = data.get("result") or data
+        addr = result.get("primary_business_address") or result.get("address") or {}
+
+        # Typical registered_address is a single string; split roughly
+        registered = addr.get("registered_address") or ""
+        parts = [p.strip() for p in registered.split(",") if p.strip()]
+
+        address_line1 = ", ".join(parts[:2]) if parts else None
+        city = parts[-3] if len(parts) >= 3 else None
+        state = parts[-2] if len(parts) >= 2 else None
+        pincode = parts[-1] if len(parts) >= 1 else None
+
+        return {
+            "address_line1": address_line1,
+            "address_line2": None,
+            "city": city,
+            "state": state,
+            "pincode": pincode,
+        }
+    except Exception as e:
+        frappe.log_error(f"GSTIN lookup failed for {gstin}: {str(e)}", "GSTIN Address Lookup")
+        return {}

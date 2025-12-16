@@ -271,3 +271,25 @@ doctype_js = {
     "Sales Order": "tally_integration/client_scripts/sales_order.js",
     "Sales Invoice": "tally_integration/client_scripts/sales_order.js"
 }
+
+# Cron job - 2 AM daily
+# scheduler_events = {
+#     "cron": {
+#         "0 2 * * *": [
+#             "tally_connect.tally_connect.doctype.tally_master_cache.tally_master_cache.sync_masters_to_cache"
+#         ]
+#     }
+# }
+
+# # Document events
+# doc_events = {
+#     "Sales Order": {
+#         "before_submit": "tally_connect.tally_integration.validators.validate_sales_order_masters"
+#     },
+#     "Sales Invoice": {
+#         "on_submit": "tally_connect.tally_integration.validators.validate_and_sync_sales_invoice"
+#     },
+#     "Credit Note": {
+#         "on_submit": "tally_connect.tally_integration.validators.validate_and_sync_credit_note"
+#     },
+# }
