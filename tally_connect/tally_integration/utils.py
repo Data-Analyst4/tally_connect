@@ -889,7 +889,7 @@ def create_sync_log(operation_type, doctype_name, doc_name, company, xml):
         log.sync_status = "QUEUED"
         log.operation_type = operation_type
         log.sync_timestamp = now()
-        log.request_xml = xml[:5000] if xml else ""
+        log.request_xml = xml if xml else ""
         
         if not server_scripts_enabled:
             # If server scripts disabled, use direct DB insert
@@ -963,7 +963,7 @@ def send_xml_to_tally(log, xml):
         )
         
         text = response.text or ""
-        log.response_xml = text[:5000]
+        log.response_xml = text
         log.response_status_code = response.status_code
         log.response_timestamp = now()
         
@@ -1012,13 +1012,13 @@ def send_xml_to_tally(log, xml):
             }
         
         log.sync_status = "FAILED"
-        log.error_message = text[:500]
+        log.error_message = text
         log.error_type = "UNKNOWN ERROR"
         log.save(ignore_permissions=True)
         frappe.db.commit()
         return {
             "success": False,
-            "error": text[:500],
+            "error": text,
             "error_type": "UNKNOWN ERROR"
         }
     
@@ -1036,19 +1036,19 @@ def send_xml_to_tally(log, xml):
     
     except requests.exceptions.ConnectionError as e:
         log.sync_status = "FAILED"
-        log.error_message = str(e)[:500]
+        log.error_message = str(e)
         log.error_type = "NETWORK ERROR"
         log.save(ignore_permissions=True)
         frappe.db.commit()
         return {
             "success": False,
-            "error": f"Connection error: {str(e)[:100]}",
+            "error": f"Connection error: {str(e)}",
             "error_type": "NETWORK ERROR"
         }
     
     except Exception as e:
         log.sync_status = "FAILED"
-        log.error_message = str(e)[:500]
+        log.error_message = str(e)
         log.error_type = "NETWORK ERROR"
         log.save(ignore_permissions=True)
         frappe.db.commit()
@@ -1060,33 +1060,61 @@ def send_xml_to_tally(log, xml):
         }
 
 
+# def classify_tally_error(error_message):
+#     """
+#     Classify Tally error to determine retry strategy
+#     Generic function - works for any Tally error
+    
+#     Returns:
+#         str: Error type code
+#     """
+#     error_lower = error_message.lower()
+    
+#     if any(keyword in error_lower for keyword in [
+#         "does not exist", "not found", "invalid", "duplicate",
+#         "already exists", "cannot be empty", "required"
+#     ]):
+#         return "VALIDATION ERROR"
+    
+#     if any(keyword in error_lower for keyword in ["parent", "group", "under"]):
+#         return "DEPENDENCY ERROR"
+    
+#     if any(keyword in error_lower for keyword in ["permission", "access denied", "not allowed"]):
+#         return "PERMISSION ERROR"
+    
+#     if any(keyword in error_lower for keyword in ["timeout", "connection", "network"]):
+#         return "NETWORK ERROR"
+    
+#     return "NETWORK ERROR"
+
 def classify_tally_error(error_message):
     """
-    Classify Tally error to determine retry strategy
-    Generic function - works for any Tally error
-    
+    Classify Tally error to determine retry strategy.
+
     Returns:
-        str: Error type code
+        str: Error type code compatible with Tally Sync Log.error_type
+             ("NETWORK ERROR", "VALIDATION ERROR",
+              "APPLICATION ERROR", "UNKNOWN ERROR")
     """
-    error_lower = error_message.lower()
-    
+    error_lower = (error_message or "").lower()
+
     if any(keyword in error_lower for keyword in [
         "does not exist", "not found", "invalid", "duplicate",
         "already exists", "cannot be empty", "required"
     ]):
         return "VALIDATION ERROR"
-    
+
+    # Dependency and permission issues → treat as application-level config errors
     if any(keyword in error_lower for keyword in ["parent", "group", "under"]):
-        return "DEPENDENCY ERROR"
-    
+        return "APPLICATION ERROR"
+
     if any(keyword in error_lower for keyword in ["permission", "access denied", "not allowed"]):
-        return "PERMISSION ERROR"
-    
+        return "APPLICATION ERROR"
+
     if any(keyword in error_lower for keyword in ["timeout", "connection", "network"]):
         return "NETWORK ERROR"
-    
-    return "TALLY ERROR"
 
+    return "UNKNOWN ERROR"
 
 # ============================================================================
 # XML UTILITY FUNCTIONS (GENERIC)
@@ -1291,3 +1319,32 @@ def get_address_from_gstin(gstin: str) -> dict:
     except Exception as e:
         frappe.log_error(f"GSTIN lookup failed for {gstin}: {str(e)}", "GSTIN Address Lookup")
         return {}
+
+import frappe
+
+def get_tally_company_for_erpnext_company(erpnext_company: str) -> str | None:
+    """
+    Return the Tally company name for a given ERPNext company.
+
+    v1.0 implementation is simple:
+    - Read Company.tally_company_name (custom field you added)
+    - If not set, fall back to Tally Integration Settings.tally_company_name
+    """
+    if not erpnext_company:
+        return None
+
+    try:
+        # Company field (recommended v1.0 mapping)
+        company = frappe.get_doc("Company", erpnext_company)
+        tally_company = getattr(company, "tally_company_name", None)
+        if tally_company:
+            return tally_company
+    except Exception:
+        pass
+
+    # Fallback to global settings
+    try:
+        settings = get_settings()
+        return getattr(settings, "tally_company_name", None)
+    except Exception:
+        return None
