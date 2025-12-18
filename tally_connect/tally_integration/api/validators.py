@@ -691,7 +691,7 @@ def guess_parent_group_for_ledger(ledger_name, settings):
     name = (ledger_name or "").lower()
 
     # Config-driven parents if present on settings DocType
-    sales_parent = getattr(settings, "sales_ledger_parent_group", None) or "Sales Accounts"
+    sales_parent = getattr(settings, "sales_ledger_parent_group", None) or "Retail Sales"
     tax_parent = getattr(settings, "tax_ledger_parent_group", None) or "Duties & Taxes"
     round_parent = getattr(settings, "round_off_parent_group", None) or "Indirect Expenses"
 

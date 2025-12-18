@@ -256,7 +256,10 @@ doc_events = {
         "before_submit": "tally_connect.tally_integration.hooks.invoice_hooks.check_dependencies_before_submit"
     },
     "Sales Invoice": {
-        "before_submit": "tally_connect.tally_integration.hooks.invoice_hooks.check_dependencies_before_submit"
+        "on_submit": "tally_connect.tally_integration.hooks.invoice_hooks.queue_invoice_sync"
+    },
+    "Customer": {
+        "after_insert": "tally_connect.tally_integration.customer.create_customer_ledger_on_insert"
     }
     # "Purchase Order": {
     #     "before_submit": "tally_connect.tally_integration.hooks.invoice_hooks.check_dependencies_before_submit"
@@ -272,6 +275,14 @@ doctype_js = {
     "Sales Invoice": "tally_integration/client_scripts/sales_order.js"
 }
 
+# Optional: Retry processor
+# scheduler_events = {
+#     "cron": {
+#         "*/10 * * * *": [
+#             "tally_connect.tally_integration.tasks.retry_processor.process_pending_retries"
+#         ]
+#     }
+# }
 # Cron job - 2 AM daily
 # scheduler_events = {
 #     "cron": {

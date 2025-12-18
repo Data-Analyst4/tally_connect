@@ -18,6 +18,7 @@
   "sales_voucher_type",
   "voucher_object_view",
   "sales_ledger_name",
+  "validate_sales_orders",
   "gst__tax_ledger_configuration_mandatory_section",
   "cgst_ledger_name",
   "sgst_ledger_name",
@@ -349,13 +350,19 @@
    "fieldname": "allow_credit_note_posting",
    "fieldtype": "Check",
    "label": "Credit Note Allow Posting"
+  },
+  {
+   "default": "1",
+   "fieldname": "validate_sales_orders",
+   "fieldtype": "Check",
+   "label": "Validate Sales Orders"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-12-14 19:36:51.894666",
+ "modified": "2025-12-18 12:23:14.737617",
  "modified_by": "Administrator",
  "module": "Tally Integration",
  "name": "Tally Integration Settings",
