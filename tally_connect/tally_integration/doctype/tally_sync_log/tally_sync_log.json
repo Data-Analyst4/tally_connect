@@ -84,7 +84,7 @@
    "fieldname": "sync_type",
    "fieldtype": "Select",
    "label": "Sync Type",
-   "options": "MASTER CREATE\nTRANSACTION",
+   "options": "\nMASTER CREATE\nTRANSACTION",
    "reqd": 1
   },
   {
@@ -126,7 +126,7 @@
    "fieldname": "error_type",
    "fieldtype": "Select",
    "label": "Error Type",
-   "options": "NETWORK ERROR\nVALIDATION ERROR\nAPPLICATION ERROR\nUNKNOWN ERROR"
+   "options": "\nNETWORK ERROR\nVALIDATION ERROR\nAPPLICATION ERROR\nUNKNOWN ERROR\nWRONG COMPANY"
   },
   {
    "default": "0",
@@ -226,7 +226,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-12 16:18:59.838389",
+ "modified": "2025-12-18 17:10:37.151870",
  "modified_by": "Administrator",
  "module": "Tally Integration",
  "name": "Tally Sync Log",

@@ -127,33 +127,80 @@ def get_tally_company_for_erpnext_company(company_name):
     return settings.tally_company_name or ""
 
 
-def create_retry_job(document_type, document_name, operation, error_message, max_retries=3):
-    """
-    Create retry job for failed sync
+# def create_retry_job(document_type, document_name, operation, error_message, max_retries=3):
+#     """
+#     Create retry job for failed sync
     
+#     Args:
+#         document_type: "Customer", "Item", etc.
+#         document_name: Document ID
+#         operation: "Create Ledger", "Create Stock Item", etc.
+#         error_message: Error description
+#         max_retries: Maximum retry attempts (default: 3)
+    
+#     Returns:
+#         Tally Retry Job document
+#     """
+#     try:
+#         retry_job = frappe.new_doc("Tally Retry Job")
+#         retry_job.document_type = document_type
+#         retry_job.document_name = document_name
+#         retry_job.operation = operation
+#         retry_job.retry_count = 0
+#         retry_job.max_retries = max_retries
+#         retry_job.status = "Pending"
+#         retry_job.error_message = error_message[:500]
+#         retry_job.next_retry_time = frappe.utils.add_to_date(now(), minutes=5)
+#         retry_job.insert(ignore_permissions=True)
+#         frappe.db.commit()
+#         return retry_job
+#     except Exception as e:
+#         frappe.log_error(f"Failed to create retry job: {str(e)}", "Tally Creators")
+#         return None
+
+import frappe
+from frappe.utils import now_datetime, add_to_date
+
+def create_retry_job(
+    document_type,
+    document_name,
+    operation,
+    error_message,
+    sync_log=None,
+    schedule_in_minutes=5,
+):
+    """
+    Create retry job for failed sync.
+
     Args:
         document_type: "Customer", "Item", etc.
         document_name: Document ID
         operation: "Create Ledger", "Create Stock Item", etc.
         error_message: Error description
-        max_retries: Maximum retry attempts (default: 3)
-    
-    Returns:
-        Tally Retry Job document
+        sync_log: Tally Sync Log doc or name to link this retry to
+        schedule_in_minutes: when to run next retry (default: 5 minutes)
     """
     try:
         retry_job = frappe.new_doc("Tally Retry Job")
         retry_job.document_type = document_type
         retry_job.document_name = document_name
         retry_job.operation = operation
-        retry_job.retry_count = 0
-        retry_job.max_retries = max_retries
-        retry_job.status = "Pending"
-        retry_job.error_message = error_message[:500]
-        retry_job.next_retry_time = frappe.utils.add_to_date(now(), minutes=5)
+
+        # required fields
+        if sync_log:
+            retry_job.sync_log = getattr(sync_log, "name", sync_log)
+        retry_job.attempt_number = 0
+        retry_job.scheduled_at = add_to_date(
+            now_datetime(), minutes=schedule_in_minutes
+        )
+
+        retry_job.status = "PENDING"  # must match Select options exactly
+        retry_job.error_message = (error_message or "")[:500]
+
         retry_job.insert(ignore_permissions=True)
         frappe.db.commit()
         return retry_job
+
     except Exception as e:
         frappe.log_error(f"Failed to create retry job: {str(e)}", "Tally Creators")
         return None
@@ -727,6 +774,27 @@ def create_customer_ledger_in_tally(customer_name, company=None):
             "retry_job": retry_job.name if retry_job else None,
         }
 
+@frappe.whitelist()
+def queue_customer_ledger_sync(customer_name, company=None):
+    """
+    Enqueue Tally sync for Customer ledger creation.
+    Non-blocking: customer insert completes immediately.
+    """
+    frappe.enqueue(
+        "tally_connect.tally_integration.api.creators.create_customer_ledger_in_tally",
+        queue="long",
+        timeout=600,
+        now=False,
+        enqueue_after_commit=True,
+        customer_name=customer_name,
+        company=company,
+        job_name=f"Tally Customer - {customer_name}",
+    )
+
+    return {
+        "success": True,
+        "message": f"Customer ledger sync queued for {customer_name}",
+    }
 
 @frappe.whitelist()
 def create_supplier_ledger_in_tally(supplier_name, company=None):
@@ -2628,6 +2696,72 @@ def create_clean_sales_invoice_in_tally(invoice_name):
             "retry_job": retry_job.name if retry_job else None,
         }
 
+def queue_sales_invoice_sync(invoice_name):
+    frappe.enqueue(
+        "tally_connect.tally_integration.api.creators.create_clean_sales_invoice_in_tally",
+        queue="long",
+        timeout=600,
+        now=False,
+        enqueue_after_commit=True,
+        invoice_name=invoice_name,
+        job_name=f"Tally Invoice - {invoice_name}",
+    )
+
+@frappe.whitelist()
+def sync_sales_invoice_now(invoice_name):
+    """
+    Run Sales Invoice sync to Tally immediately (no enqueue).
+    Used for testing the core flow from client or console.
+    """
+    from tally_connect.tally_integration.api.creators import (
+        create_clean_sales_invoice_in_tally,
+    )
+
+    try:
+        result = create_clean_sales_invoice_in_tally(invoice_name)
+
+        # Ensure common shape
+        success = bool(result.get("success"))
+        retry_job = result.get("retry_job")
+        error = result.get("error")
+        sync_log = result.get("sync_log")
+
+        return {
+            "success": success,
+            "invoice_name": invoice_name,
+            "sync_log": sync_log,
+            "retry_job": retry_job,
+            "error": error,
+        }
+
+    except Exception as e:
+        frappe.log_error(
+            f"Exception in sync_sales_invoice_now for {invoice_name}: {str(e)}",
+            "Tally Invoice Immediate Sync",
+        )
+        return {
+            "success": False,
+            "invoice_name": invoice_name,
+            "sync_log": None,
+            "retry_job": None,
+            "error": f"Exception: {str(e)}",
+        }
+
+# def queue_sales_invoice_sync(invoice_name):
+#     """
+#     Enqueue Sales Invoice sync as a background job.
+#     Safe to call from hooks or manual actions.
+#     """
+
+#     frappe.enqueue(
+#         "tally_connect.tally_integration.api.creators.create_clean_sales_invoice_in_tally",
+#         queue="long",
+#         timeout=600,
+#         now=False,
+#         enqueue_after_commit=True,
+#         invoice_name=invoice_name,
+#         job_name=f"Tally Invoice - {invoice_name}",
+#     )
 
 
 def get_reference_date_for_credit_note(credit_note_name: str) -> str | None:
@@ -3159,10 +3293,10 @@ def create_clean_credit_note_in_tally(credit_note_name):
 
         # ---------- 9. Update ERPNext doc ----------
         try:
-            cn.db_set("custom_posted_to_tally", 1, update_modified=False)
-            cn.db_set("custom_tally_voucher_number", voucher_number, update_modified=False)
-            cn.db_set("custom_tally_push_status", "Success", update_modified=False)
-            cn.db_set("custom_tally_sync_date", frappe.utils.now(), update_modified=False)
+            cn.db_set("custom_cn_to_tally", 1, update_modified=False)
+            cn.db_set("custom_cn_voucher_number", voucher_number, update_modified=False)
+            cn.db_set("custom_cn_push_status", "Success", update_modified=False)
+            cn.db_set("custom_cn_sync_date", frappe.utils.now(), update_modified=False)
             frappe.db.commit()
         except Exception:
             pass
@@ -3188,3 +3322,103 @@ def create_clean_credit_note_in_tally(credit_note_name):
             "error": error_msg,
             "retry_job": retry_job.name if retry_job else None,
         }
+
+import frappe
+
+# @frappe.whitelist()
+# def queue_sales_invoice_or_return_sync(invoice_name):
+#     """
+#     Enqueue Tally sync for Sales Invoice or Credit Note (return).
+#     Decides which creator to use based on is_return.
+#     """
+#     doc = frappe.get_doc("Sales Invoice", invoice_name)
+
+#     if doc.docstatus != 1:
+#         return {
+#             "success": False,
+#             "error": "Document must be submitted before syncing to Tally",
+#         }
+
+#     # Decide target API
+#     if getattr(doc, "is_return", 0):
+#         method_path = (
+#             "tally_connect.tally_integration.api.creators."
+#             "create_clean_credit_note_in_tally" 
+#         )
+#         job_label = "Tally Credit Note"
+#     else:
+#         method_path = (
+#             "tally_connect.tally_integration.api.creators."
+#             "create_clean_sales_invoice_in_tally"
+#         )
+#         job_label = "Tally Invoice"
+
+#     # Enqueue background job
+#     frappe.enqueue(
+#         method_path,
+#         queue="long",
+#         timeout=600,
+#         now=False,
+#         enqueue_after_commit=True,
+#         invoice_name=invoice_name if not getattr(doc, "is_return", 0) else None,
+#         credit_note_name=invoice_name if getattr(doc, "is_return", 0) else None,
+#         job_name=f"{job_label} - {invoice_name}",
+#     )
+
+#     return {
+#         "success": True,
+#         "message": f"{job_label} sync queued for {invoice_name}",
+#     }
+
+import frappe
+
+
+@frappe.whitelist()
+def queue_sales_invoice_or_return_sync(invoice_name):
+    """
+    Enqueue Tally sync for Sales Invoice or Credit Note (return).
+    Decides which creator to use based on is_return.
+    """
+    doc = frappe.get_doc("Sales Invoice", invoice_name)
+
+    if doc.docstatus != 1:
+        return {
+            "success": False,
+            "error": "Document must be submitted before syncing to Tally",
+        }
+
+    # Decide target API and prepare correct arguments
+    if getattr(doc, "is_return", 0):
+        # This is a Credit Note
+        method_path = (
+            "tally_connect.tally_integration.api.creators."
+            "create_clean_credit_note_in_tally"
+        )
+        job_label = "Tally Credit Note"
+        # Pass only credit_note_name argument
+        enqueue_kwargs = {"credit_note_name": invoice_name}
+    else:
+        # This is a normal Sales Invoice
+        method_path = (
+            "tally_connect.tally_integration.api.creators."
+            "create_clean_sales_invoice_in_tally"
+        )
+        job_label = "Tally Invoice"
+        # Pass only invoice_name argument
+        enqueue_kwargs = {"invoice_name": invoice_name}
+
+    # Enqueue background job
+    frappe.enqueue(
+        method_path,
+        queue="long",
+        timeout=600,
+        now=False,
+        enqueue_after_commit=True,
+        job_name=f"{job_label} - {invoice_name}",
+        **enqueue_kwargs  # Unpack only the correct argument
+    )
+
+    return {
+        "success": True,
+        "message": f"{job_label} sync queued for {invoice_name}",
+    }

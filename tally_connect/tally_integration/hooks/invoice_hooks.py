@@ -175,3 +175,144 @@ def _create_master_now(master, company):
             "success": False,
             "error": f"{master_type}: {str(e)}"
         }
+
+import frappe
+from frappe import _
+# def queue_invoice_sync(doc, method):
+#     """
+#     Sales Invoice on_submit: auto-sync to Tally
+#     NEVER blocks submission even if sync fails
+#     """
+#     try:
+#         if doc.doctype != "Sales Invoice":
+#             return
+
+#         from tally_connect.tally_integration.utils import get_settings
+#         settings = get_settings()
+        
+#         # Check if integration enabled
+#         if not settings.enabled:
+#             return
+            
+#         # Check if invoice sync enabled (optional setting check)
+#         if not getattr(settings, "sync_sales_invoices", 1):
+#             return
+
+#         is_credit_note = bool(getattr(doc, "is_return", 0))
+
+#         if is_credit_note:
+#             # Credit Note
+#             frappe.enqueue(
+#                 "tally_connect.tally_integration.api.creators.create_credit_note_in_tally",
+#                 queue="long",
+#                 timeout=600,
+#                 now=False,
+#                 enqueue_after_commit=True,
+#                 credit_note_name=doc.name,
+#                 job_name=f"Tally Credit Note - {doc.name}",
+#             )
+#         else:
+#             # Normal Invoice
+#             frappe.enqueue(
+#                 "tally_connect.tally_integration.api.creators.create_sales_invoice_in_tally",
+#                 queue="long",
+#                 timeout=600,
+#                 now=False,
+#                 enqueue_after_commit=True,
+#                 invoice_name=doc.name,
+#                 job_name=f"Tally Invoice - {doc.name}",
+#             )
+    
+#     except Exception as e:
+#         # Log error but do NOT block submission
+#         frappe.log_error(
+#             title=f"Tally Sync Hook Error: {doc.name}",
+#             message=f"Failed to enqueue Tally sync for {doc.name}\n\nError: {str(e)}"
+#         )
+#         # Optionally show a non-blocking message to user
+#         frappe.msgprint(
+#             f"Invoice submitted successfully, but Tally sync could not be queued. Check Error Log.",
+#             indicator="orange",
+#             alert=True
+#         )
+
+def queue_invoice_sync(doc, method):
+    try:
+        frappe.enqueue(
+            "tally_connect.tally_integration.api.creators.create_clean_sales_invoice_in_tally",
+            queue="long",
+            timeout=600,
+            now=False,
+            enqueue_after_commit=True,
+            invoice_name=doc.name,
+            job_name=f"Tally Invoice - {doc.name}",
+        )
+    except Exception as e:
+        frappe.log_error(f"Failed to enqueue Tally sync for {doc.name}: {str(e)}",
+                         "Tally Invoice Enqueue")
+        frappe.msgprint(
+            "Invoice submitted, but Tally sync could not be queued. Check Error Log.",
+            alert=True,
+            indicator="orange",
+        )
+
+
+
+import frappe
+from tally_connect.tally_integration.api.creators import (
+    queue_sales_invoice_or_return_sync,
+)
+
+# def queue_sales_invoice_sync_on_submit(doc, method):
+#     # Safety checks
+#     if doc.doctype != "Sales Invoice":
+#         return
+#     if doc.docstatus != 1:
+#         return
+
+#     # Optional: avoid double sync
+#     # if getattr(doc, "custom_posted_to_tally", 0) and getattr(doc."custom_cn_to_tally", 0):
+#     #     return
+
+#     # Enqueue appropriate sync (invoice or credit note)
+#     queue_sales_invoice_or_return_sync(doc.name)
+
+#     # Optional user message
+#     frappe.msgprint(
+#         "Tally sync has been queued.",
+#         alert=True,
+#         indicator="green",
+#     )
+
+import frappe
+from tally_connect.tally_integration.api.creators import (
+    queue_sales_invoice_or_return_sync,
+)
+
+
+def queue_sales_invoice_sync_on_submit(doc, method):
+    # Safety checks
+    if doc.doctype != "Sales Invoice":
+        return
+    if doc.docstatus != 1:
+        return
+
+    # Check the right "already posted" field based on document type
+    if getattr(doc, "is_return", 0):
+        # For credit notes, check custom_cn_to_tally
+        if getattr(doc, "custom_cn_to_tally", 0):
+            return  # Already synced as credit note
+    else:
+        # For invoices, check custom_posted_to_tally
+        if getattr(doc, "custom_posted_to_tally", 0):
+            return  # Already synced as invoice
+
+    # Enqueue appropriate sync (invoice or credit note)
+    queue_sales_invoice_or_return_sync(doc.name)
+
+    # Optional user message
+    frappe.msgprint(
+        "Tally sync has been queued.",
+        alert=True,
+        indicator="green",
+    )

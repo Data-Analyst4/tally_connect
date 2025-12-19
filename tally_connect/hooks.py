@@ -256,7 +256,7 @@ doc_events = {
         "before_submit": "tally_connect.tally_integration.hooks.invoice_hooks.check_dependencies_before_submit"
     },
     "Sales Invoice": {
-        "on_submit": "tally_connect.tally_integration.hooks.invoice_hooks.queue_invoice_sync"
+        "on_submit": "tally_connect.tally_integration.hooks.invoice_hooks.queue_sales_invoice_sync_on_submit"
     },
     "Customer": {
         "after_insert": "tally_connect.tally_integration.customer.create_customer_ledger_on_insert"
@@ -270,10 +270,10 @@ doc_events = {
 }
 
 # Client Scripts (add this section if not exists)
-doctype_js = {
-    "Sales Order": "tally_integration/client_scripts/sales_order.js",
-    "Sales Invoice": "tally_integration/client_scripts/sales_order.js"
-}
+# doctype_js = {
+#     "Sales Order": "tally_integration/client_scripts/sales_order.js",
+#     # "Sales Invoice": "tally_integration/client_scripts/sales_order.js"
+# }
 
 # Optional: Retry processor
 # scheduler_events = {
