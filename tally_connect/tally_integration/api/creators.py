@@ -2129,22 +2129,48 @@ def to_dd_mmm_yyyy(val):
     return val.strftime("%d-%b-%Y") if isinstance(val, datetime) else str(val)
 
 
-def address_two_lines(addr):
-    """Return [line1, line2] built from Address doc."""
+# def address_two_lines(addr):
+#     """Return [line1, line2] built from Address doc."""
+#     if not addr:
+#         return []
+#     line1 = addr.address_line1 or ""
+#     bits = []
+#     if addr.address_line2:
+#         bits.append(addr.address_line2)
+#     if addr.city:
+#         bits.append(addr.city)
+#     if addr.state:
+#         bits.append(addr.state)
+#     if addr.pincode:
+#         bits.append(addr.pincode)
+#     line2 = ", ".join(bits) if bits else ""
+#     return [l for l in (line1, line2) if l]
+
+# DELETE old function → REPLACE with:
+def address_two_lines_smart(addr, customer_name="Customer"):
+    """🚀 FIXED: 100% safe + Tally perfect."""
     if not addr:
-        return []
-    line1 = addr.address_line1 or ""
-    bits = []
-    if addr.address_line2:
-        bits.append(addr.address_line2)
-    if addr.city:
-        bits.append(addr.city)
-    if addr.state:
-        bits.append(addr.state)
-    if addr.pincode:
-        bits.append(addr.pincode)
-    line2 = ", ".join(bits) if bits else ""
-    return [l for l in (line1, line2) if l]
+        return [customer_name[:50], "India"]
+    
+    # LINE 1: address_line1 ONLY
+    line1_parts = []
+    if hasattr(addr, 'address_line1') and addr.address_line1:
+        line1_parts.append(addr.address_line1.strip())
+    line1 = " ".join(line1_parts)[:50] or customer_name[:50]
+    
+    # LINE 2: address_line2 + City/State/PIN
+    line2_parts = []
+    if hasattr(addr, 'address_line2') and addr.address_line2:
+        line2_parts.append(addr.address_line2.strip())
+    if hasattr(addr, 'city') and addr.city:
+        line2_parts.append(addr.city.strip())
+    if hasattr(addr, 'state') and addr.state:
+        line2_parts.append(addr.state.strip())
+    if hasattr(addr, 'pincode') and addr.pincode:
+        line2_parts.append(addr.pincode.strip())
+    
+    line2 = ", ".join(line2_parts)[:50] or "India"
+    return [line1, line2]
 
 
 @frappe.whitelist()
@@ -2340,14 +2366,18 @@ def create_clean_sales_invoice_in_tally(invoice_name):
             else None
         )
 
-        buyer_lines = address_two_lines(billing_addr)
-        ship_lines = address_two_lines(shipping_addr)
+        # buyer_lines = address_two_lines(billing_addr)
+        # ship_lines = address_two_lines(shipping_addr)
 
-        # Ensure [0] and [1] exist
-        while len(buyer_lines) < 2:
-            buyer_lines.append("")
-        while len(ship_lines) < 2:
-            ship_lines.append("")
+        # # Ensure [0] and [1] exist
+        # while len(buyer_lines) < 2:
+        #     buyer_lines.append("")
+        # while len(ship_lines) < 2:
+        #     ship_lines.append("")
+        # NEW (bulletproof):
+        customer_name = inv.customer_name or inv.customer or "Customer"
+        buyer_lines = address_two_lines_smart(billing_addr, customer_name)
+        ship_lines = address_two_lines_smart(shipping_addr, customer_name)
 
         # Build XML address blocks for header
         buyer_xml = ""
