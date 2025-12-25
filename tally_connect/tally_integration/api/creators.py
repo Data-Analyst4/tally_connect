@@ -16,7 +16,7 @@ FEATURES:
 
 import frappe
 from frappe import _
-from datetime import datetime
+from datetime import datetime, date  # ✅ Added date for proper date handling
 from frappe.utils import flt, cint, now
 from tally_connect.tally_integration.utils import (
     get_settings,
@@ -2107,26 +2107,39 @@ def create_sales_invoice_in_tally(invoice_name):
 
 
 import frappe
-from datetime import datetime
+from datetime import datetime, date  # ✅ Added date for proper date handling
 from frappe.utils import flt, now
 
 
 def get_reference_date_for_sales_invoice(invoice_name: str) -> str | None:
-    """Return PO date if available."""
+    """Return PO date if available, formatted as YYYYMMDD."""
     inv = frappe.get_doc("Sales Invoice", invoice_name)
     if inv.po_date:
-        return str(inv.po_date)
+        return to_yyyymmdd(inv.po_date)  # ✅ Updated to use to_yyyymmdd()
     return None
 
 
 def to_yyyymmdd(val):
-    """Format date as YYYYMMDD for Tally."""
-    return val.strftime("%Y%m%d") if isinstance(val, datetime) else str(val)
+    """
+    Format date as YYYYMMDD for Tally.
+    Handles datetime, date objects, and string dates.
+    """
+    if isinstance(val, (datetime, date)):  # ✅ Now handles both datetime and date
+        return val.strftime("%Y%m%d")
+    elif isinstance(val, str):
+        # Handle string dates like "2025-12-08"
+        return val.replace("-", "")
+    return str(val)
 
 
 def to_dd_mmm_yyyy(val):
-    """Format date as DD-MMM-YYYY for display."""
-    return val.strftime("%d-%b-%Y") if isinstance(val, datetime) else str(val)
+    """
+    Format date as DD-MMM-YYYY for display.
+    Handles datetime, date objects, and strings.
+    """
+    if isinstance(val, (datetime, date)):  # ✅ Now handles both datetime and date
+        return val.strftime("%d-%b-%Y")
+    return str(val)
 
 
 # def address_two_lines(addr):
