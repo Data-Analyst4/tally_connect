@@ -252,15 +252,21 @@ app_license = "mit"
 
 # Document Events
 doc_events = {
-    "Sales Order": {
-        "before_submit": "tally_connect.tally_integration.hooks.invoice_hooks.check_dependencies_before_submit"
-    },
-    "Sales Invoice": {
-        "on_submit": "tally_connect.tally_integration.hooks.invoice_hooks.queue_sales_invoice_sync_on_submit"
-    },
+    # "Sales Order": {
+    #     "before_submit": "tally_connect.tally_integration.hooks.invoice_hooks.check_dependencies_before_submit"
+    # },
+    # "Sales Invoice": {
+    #     "on_submit": "tally_connect.tally_integration.hooks.invoice_hooks.queue_sales_invoice_sync_on_submit"
+    # },
     "Customer": {
         "after_insert": "tally_connect.tally_integration.customer.create_customer_ledger_on_insert"
-    }
+    },
+    "Sales Order": {
+        "on_submit": "tally_connect.tally_integration.doctype_handlers.sales_order.on_submit"
+    },
+    # "Sales Invoice": {
+    #     "on_submit": "tally_connect.tally_integration.doctype_handlers.sales_invoice.on_submit"
+    # }
     # "Purchase Order": {
     #     "before_submit": "tally_connect.tally_integration.hooks.invoice_hooks.check_dependencies_before_submit"
     # },
@@ -270,10 +276,11 @@ doc_events = {
 }
 
 # Client Scripts (add this section if not exists)
-# doctype_js = {
-#     "Sales Order": "tally_integration/client_scripts/sales_order.js",
-#     # "Sales Invoice": "tally_integration/client_scripts/sales_order.js"
-# }
+doctype_js = {
+    # "Sales Order": "tally_integration/client_scripts/sales_order.js",
+    # "Sales Invoice": "tally_integration/client_scripts/sales_order.js",
+    "Sales Invoice": "tally_integration/client_scripts/sales_invoice.js"
+}
 
 # Optional: Retry processor
 # scheduler_events = {
@@ -303,4 +310,11 @@ doc_events = {
 #     "Credit Note": {
 #         "on_submit": "tally_connect.tally_integration.validators.validate_and_sync_credit_note"
 #     },
+# }
+# scheduler_events = {
+#     "cron": {
+#         "* * * * *": [  # Every 1 minute
+#             "tally_connect.tally_integration.tasks.retry_scheduler.process_pending_retries"
+#         ]
+#     }
 # }
