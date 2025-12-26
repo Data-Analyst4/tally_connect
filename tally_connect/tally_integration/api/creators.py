@@ -4532,6 +4532,8 @@ def create_clean_sales_invoice_in_tally(invoice_name):
        <ACCOUNTINGALLOCATIONS.LIST>
         <LEDGERNAME>{escape_xml(sales_ledger)}</LEDGERNAME>
         <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+        <LEDGERFROMITEM>No</LEDGERFROMITEM>
+        <ISPARTYLEDGER>No</ISPARTYLEDGER>
         <AMOUNT>{line_amount:.2f}</AMOUNT>
        </ACCOUNTINGALLOCATIONS.LIST>
        <RATEDETAILS.LIST>
